@@ -1163,12 +1163,14 @@ CAPABILITIES: dict[int, Entity] = {
         type=CapabilityType.TEMPERATURE,
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
+        needs_flag="airConditionerAvailable",
     ),
     163: Entity(
         name="cooling_temperature_max",
         type=CapabilityType.TEMPERATURE,
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
+        needs_flag="airConditionerAvailable",
     ),
     164: Entity(
         name="energy_consumption_supported",
@@ -1266,6 +1268,7 @@ CAPABILITIES: dict[int, Entity] = {
         enabled_by_default=True,
         absent_on=(CozytouchDeviceType.GAZ_BOILER,),
         extra={"lowestValueCapabilityId": 162, "highestValueCapabilityId": 163},
+        needs_flag="airConditionerAvailable",
     ),
     178: Entity(
         name="target_temperature_cool_z2",
@@ -2331,6 +2334,7 @@ CAPABILITIES: dict[int, Entity] = {
         reads_as=_SPEED_SETS,
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
+        needs_flag="airConditionerAvailable",
     ),
     351: Entity(
         name="connectivity_display_capabilities",
@@ -2364,18 +2368,21 @@ CAPABILITIES: dict[int, Entity] = {
         type=CapabilityType.TEMPERATURE,
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
+        needs_flag="airConditionerAvailable",
     ),
     356: Entity(
         name="presence_day_cooling_temperature",
         type=CapabilityType.TEMPERATURE,
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
+        needs_flag="airConditionerAvailable",
     ),
     357: Entity(
         name="presence_night_cooling_temperature",
         type=CapabilityType.TEMPERATURE,
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
+        needs_flag="airConditionerAvailable",
     ),
     358: Entity(
         name="thermal_ambiance_scope",
@@ -2850,6 +2857,7 @@ CAPABILITIES: dict[int, Entity] = {
         type=CapabilityType.SWITCH,
         enabled_by_default=True,
         icon="mdi:wind-power",
+        needs_flag="airConditionerAvailable",
     ),
     100506: Entity(
         # Towel dryers only: no capture has one reporting it, and the branch
@@ -2923,6 +2931,7 @@ CAPABILITIES: dict[int, Entity] = {
         reads_as=_SPEED_SETS,
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
+        needs_flag="airConditionerAvailable",
     ),
     100801: Entity(
         # The speed the fan is actually running, which the climate entity
@@ -2934,12 +2943,14 @@ CAPABILITIES: dict[int, Entity] = {
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
         reads_as={"1": "low", "2": "medium", "3": "high", "5": "auto"},
+        needs_flag="airConditionerAvailable",
     ),
     100802: Entity(
         name="quiet_mode",
         type=CapabilityType.SWITCH,
         enabled_by_default=True,
         icon="mdi:fan-minus",
+        needs_flag="airConditionerAvailable",
     ),
     100803: Entity(
         # Six flap positions on a Fujitsu indoor unit, plus a zero the vendor
@@ -2957,12 +2968,14 @@ CAPABILITIES: dict[int, Entity] = {
             "5": "position_5",
             "6": "position_6",
         },
+        needs_flag="airConditionerAvailable",
     ),
     100804: Entity(
         name="swing_mode",
         type=CapabilityType.SWITCH,
         enabled_by_default=True,
         icon="mdi:arrow-oscillating",
+        needs_flag="airConditionerAvailable",
     ),
     101302: Entity(
         name="outside_temperature_available",
@@ -3103,6 +3116,7 @@ CAPABILITIES: dict[int, Entity] = {
         type=CapabilityType.BINARY,
         category=CapabilityCategory.DIAG,
         enabled_by_default=False,
+        needs_flag="airConditionerAvailable",
     ),
     103115: Entity(
         name="boost_duration",

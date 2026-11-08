@@ -116,7 +116,10 @@ def _wire_presets(
         and 100507 in availableCapabilityIds
     ):
         capability.ecoCapabilityId = 100507
-    if 100505 in availableCapabilityIds:
+    if (
+        modelInfos.get("airConditionerAvailable", True)
+        and 100505 in availableCapabilityIds
+    ):
         capability.boostCapabilityId = 100505
 
 
@@ -138,7 +141,10 @@ def _room_entity(
         capability.progCapabilityId = 184
     if 157 in availableCapabilityIds:
         _wire_override(capability)
-    if 177 in availableCapabilityIds:
+    if (
+        modelInfos.get("airConditionerAvailable", True)
+        and 177 in availableCapabilityIds
+    ):
         _wire_cooling(capability)
     _wire_presets(capability, modelInfos, availableCapabilityIds)
 

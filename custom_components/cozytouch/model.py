@@ -466,6 +466,33 @@ MODEL_NAMES: dict[int, str] = {
 }
 
 
+# The generators of 103026 that can only heat : boiler, panel heater, towel
+# dryer, floor heater and the two I2G heaters. See docs/decisions.md.
+HEATING_ONLY_GENERATORS = 4 | 16 | 32 | 64 | 128 | 256
+
+
+def heats_only(generators: str | None) -> bool:
+    """Whether a room's 103026 names generators, every one of them heat only."""
+    try:
+        value = int(generators or 0)
+    except ValueError:
+        return False
+    return value > 0 and not value & ~HEATING_ONLY_GENERATORS
+
+
+def drop_air_conditioner(modelInfos: ModelInfos) -> None:
+    """Take off a room what `_AC_ROOM` gave it for an air conditioner it lacks."""
+    modelInfos.HVACModes = {
+        value: mode
+        for value, mode in modelInfos.get("HVACModes", {}).items()
+        if mode in (HVACMode.OFF, HVACMode.HEAT)
+    }
+    modelInfos.quietModeAvailable = False
+    modelInfos.airConditionerAvailable = False
+    for key in ("fanModes", "swingModes", "AirCirculationSpeeds"):
+        modelInfos.pop(key, None)
+
+
 def apply_capabilities(
     modelInfos: ModelInfos, capabilities: dict[int, str]
 ) -> None:
@@ -494,6 +521,11 @@ def apply_capabilities(
         if capabilities.get(106000) == "0":
             modelInfos.type = CozytouchDeviceType.THERMOSTAT
         return
+
+    if modelInfos.type is CozytouchDeviceType.ROOM and heats_only(
+        capabilities.get(103026)
+    ):
+        drop_air_conditioner(modelInfos)
 
     if not modelInfos.HVACModes:
         return

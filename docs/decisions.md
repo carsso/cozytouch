@@ -3925,6 +3925,55 @@ So it stays a diagnostic. If a dump from a room behind a radiator ever shows
 16, 32 or 64 on it, the change is to skip those flags in `apply_capabilities`,
 where 100022 and 106000 are already read, and nothing else moves.
 
+### A room 103026 calls heat only loses the air conditioner
+
+The dump the entry above was waiting for came in on 2026-11-08 : a Thermor
+connected floor-heating thermostat (`THERMOSTAT PRE CONNECT`, THZONE 1505,
+productId 65) behind a CozyBox (2448, productId 63), with its room slot 557.
+The room reads 64 on 103026, floor heater, and everything else it says agrees :
+73 is 2 (`HeatingOnly`), 166 is 17 (off and heat), the THZONE's 100014 is 8
+(`ElectricFloorHeater`). It also reads 415 on 100022, the full air-conditioner
+mask, which is why the narrowing by 100022 left cool, auto, fan and dry on it :
+that mask belongs to the firmware family, not to the room.
+
+The Thermor app, captured beside the dump, offers that room an on/off switch,
+manual or program, a setpoint and the open window detection. Nothing of an air
+conditioner. Home Assistant offered it all six modes, a cooling setpoint, fan
+and swing modes, and quiet, oscillation and powerful switches -- issue #202
+reports the same on an Atlantic PRE thermostat.
+
+So `apply_capabilities` now reads 103026 on a room, and when every generator it
+names is one that only heats -- boiler, panel heater, towel dryer, floor heater
+and the two I2G heaters, `HEATING_ONLY_GENERATORS` -- it keeps off and heat and
+takes back what `_AC_ROOM` gave : the fan, swing and air circulation lists, the
+quiet mode, and a new `airConditionerAvailable` flag that the rows of the
+cooling setpoints (177, 162, 163, 355-357), the fan (350, 100800, 100801,
+103114), the louvers (100803, 100804), quiet (100802) and powerful (100505)
+need, as does the cooling and boost wiring of the room's climate entity.
+
+What it does not do, deliberately :
+
+- A room reading 0, nothing, or any generator that can cool keeps everything.
+  The air-to-water heat pump (2) counts as one that can, since some are
+  reversible, and the reserved bit (1) counts as unknown. A floor heater beside
+  a split (72) is a room that cools.
+- The type does not change : a room is still a room with its neutral icon, as
+  the entry above argues.
+- The presence mode (100506) and the boost (104044) stay. The radiators report
+  the first and are sold on it ; nothing here says the second is an air
+  conditioner's.
+- Only the room slot is read. The THZONE's 100014 says the same thing from the
+  other side, but a room may front several zones, and 103026 already speaks for
+  all of them.
+
+An install that already built those entities keeps them, unavailable, to
+delete by hand : the same trade as every entity that stops being built, and
+no migration, since which rooms lost them depends on what each one reports.
+
+The evidence is one installation, on one gateway. It covers 103026 = 64 ; 16,
+32, 4 and the I2G values are inferred from the catalogue's names. A dump of a
+room behind a radiator gateway reading 16 is what would confirm the rest.
+
 ### A capability the chain steers on still needs a row
 
 `_climate_entity` wires ids onto the climate entity -- a fan speed, a louver
