@@ -31,7 +31,7 @@ from .capability import get_capability_infos
 from .capability_table import CAPABILITIES
 from .const import DOMAIN
 from .infos import CapabilityCategory, CapabilityInfos, CapabilityType
-from .model import CozytouchDeviceType, get_device_model_infos, get_model_infos
+from .model import get_device_model_infos, get_model_infos
 from .repairs import async_check_faults
 
 _LOGGER = logging.getLogger(__name__)
@@ -438,10 +438,8 @@ class Hub(DataUpdateCoordinator):
         None for anything but a room, and for a room whose zone the account
         does not name. See docs/decisions.md.
         """
-        if self.get_model_infos().type is not CozytouchDeviceType.ROOM:
-            return None
         dev = device_of(self)
-        return self.get_zone_name(dev["zoneId"]) if dev else None
+        return self._account.room_name(dev) if dev else None
 
     def get_model_id(self, deviceId: int | None = None) -> int | None:
         """The model id the API reports, which is what the mapping is keyed on."""

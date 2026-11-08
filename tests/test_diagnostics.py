@@ -85,6 +85,7 @@ def test_a_zone_is_not_offered_when_adding_the_integration():
             device(2, 1505, name="THZONE_0"),
         ]
     )
+    account.room_name = lambda dev: None
 
     summaries = CozytouchAccount.device_summaries(account)
 

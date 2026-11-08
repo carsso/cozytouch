@@ -2250,6 +2250,15 @@ every entity of a subentry describes the device, the registry keeps the name
 from whichever was added last, and with the sensor alone an upgraded install
 came back as `Room (Chambre parentale)` beside `Chambre enfant`.
 
+The subentry carried the slot too, on the integration page and in the picker
+that adds a device. `CozytouchAccount.room_name` is where the zone is read, for
+the hub and for `device_summaries`, which now gives each device a `label` : the
+picker lists it and a new subentry is titled with it, while `data["name"]` keeps
+the API's name, since a 1.4 entry is matched on it. An existing room subentry
+still titled with that name is retitled at setup, before the update listener is
+registered, so the rename does not reload the entry it happens in ; one titled
+anything else was renamed by somebody and is left alone.
+
 What moves with it : a new install's entity ids follow the device name, so a
 room's climate is `climate.salon_piece` rather than `climate.room_salon_piece`.
 An existing install keeps the ids it has -- the registry does not regenerate

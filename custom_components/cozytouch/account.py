@@ -877,11 +877,23 @@ class CozytouchAccount:
                 {
                     "deviceId": dev["deviceId"],
                     "name": dev["name"],
+                    "label": self.room_name(dev) or dev["name"],
                     "model": modelInfos.name,
                 }
             )
 
         return summaries
+
+    def room_name(self, dev: dict) -> str | None:
+        """The name of the zone a room serves, None for anything else.
+
+        A room's own `name` is its slot, `ROOM_0` ; what its user called it is
+        the zone's. See docs/decisions.md.
+        """
+        modelInfos = get_device_model_infos(self.devices, dev)
+        if modelInfos.type is not CozytouchDeviceType.ROOM:
+            return None
+        return self.get_zone_name(dev.get("zoneId"))
 
     def get_zone_name(self, zoneId: int | None) -> str | None:
         """What the account calls a zone, or None when it does not name it.

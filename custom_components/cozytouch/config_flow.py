@@ -65,7 +65,7 @@ def _device_options(
     """
     return [
         selector.SelectOptionDict(
-            label=f"{device['name']} ({device['model']})",
+            label=f"{device.get('label', device['name'])} ({device['model']})",
             value=str(device["deviceId"]),
         )
         for device in devices
@@ -91,7 +91,7 @@ def _subentry_for(device: dict) -> dict[str, Any]:
     """
     return {
         "subentry_type": SUBENTRY_TYPE,
-        "title": device["name"],
+        "title": device.get("label", device["name"]),
         "unique_id": f"cozytouch_{device['deviceId']}",
         "data": {"deviceId": device["deviceId"], "name": device["name"]},
     }
