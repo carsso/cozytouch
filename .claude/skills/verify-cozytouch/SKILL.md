@@ -112,7 +112,7 @@ again.
   `custom_components/cozytouch` and restarts the process ; a reload is not
   enough, as on a real install.
 
-Entity ids come from the French names (`climate.room_chambre_parentale_piece`,
+Entity ids come from the French names (`climate.chambre_parentale_piece`,
 `datetime.hub_away_mode_start`) ; `R states` gives them, and each feature
 file names the ones it uses.
 
@@ -123,7 +123,7 @@ Screenshots, with Playwright (`npm install -g playwright` and
 
 ```bash
 export NODE_PATH=$(npm root -g)
-PAGE=$(R device climate.room_chambre_parentale_piece)
+PAGE=$(R device climate.chambre_parentale_piece)
 node scripts/test_ha/screenshot.cjs "$PAGE" OUT.png --full            # a device page
 node scripts/test_ha/screenshot.cjs "$PAGE" OUT.png --click "Pièce"   # its climate dialog
 ```

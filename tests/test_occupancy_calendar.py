@@ -63,6 +63,7 @@ def make_hub(values):
         get_serial_number=lambda: "1234-5678-0000",
         get_software_version=lambda: None,
         get_via_device=lambda: None,
+        get_room_name=lambda: None,
     )
 
 

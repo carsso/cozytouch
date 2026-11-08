@@ -56,9 +56,13 @@ class CloudConnectivity(CozytouchDeviceEntity, BinarySensorEntity):
 
     @property
     def device_info(self) -> DeviceInfo:
-        """Return the device info, under the entry title rather than the model."""
+        """Return the device info, under the entry title rather than the model.
+
+        A room is named after its zone instead : its title is the API's slot
+        name, `ROOM_0`, which says nothing. See docs/decisions.md.
+        """
         info = device_info_for(self.coordinator, self._device_uniq_id)
-        info["name"] = self._title
+        info["name"] = self.coordinator.get_room_name() or self._title
         return info
 
     @callback

@@ -31,7 +31,7 @@ from .capability import get_capability_infos
 from .capability_table import CAPABILITIES
 from .const import DOMAIN
 from .infos import CapabilityCategory, CapabilityInfos, CapabilityType
-from .model import get_device_model_infos, get_model_infos
+from .model import CozytouchDeviceType, get_device_model_infos, get_model_infos
 from .repairs import async_check_faults
 
 _LOGGER = logging.getLogger(__name__)
@@ -431,6 +431,17 @@ class Hub(DataUpdateCoordinator):
         return get_device_model_infos(
             self._account.devices, dev, self.get_zone_name(zoneId)
         )
+
+    def get_room_name(self) -> str | None:
+        """The zone a room serves, which is what its user named it.
+
+        None for anything but a room, and for a room whose zone the account
+        does not name. See docs/decisions.md.
+        """
+        if self.get_model_infos().type is not CozytouchDeviceType.ROOM:
+            return None
+        dev = device_of(self)
+        return self.get_zone_name(dev["zoneId"]) if dev else None
 
     def get_model_id(self, deviceId: int | None = None) -> int | None:
         """The model id the API reports, which is what the mapping is keyed on."""
@@ -942,7 +953,8 @@ def device_info_for(coordinator: Hub, device_uniq_id: str) -> DeviceInfo:
     info = DeviceInfo(
         identifiers={(DOMAIN, device_uniq_id)},
         manufacturer="Atlantic",
-        name=model_name,
+        # A room is its zone, as the app shows it. See docs/decisions.md.
+        name=coordinator.get_room_name() or model_name,
         model=model_name,
         serial_number=coordinator.get_serial_number(),
         # On the device and not only as a diagnostic entity : "which version
