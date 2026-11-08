@@ -43,6 +43,10 @@ overturn one, edit the line here in the same pull request.
 - **153 stays 0 on the Navizone rooms while cooling**, so it is no running
   signal there. **Absence timestamps are plain unix time** ; 315 is not
   added. Both from the 2026-09-25 dump, `docs/decisions.md`.
+- **A room whose 103026 names only heating generators has no air
+  conditioner** : off and heat, no cooling, fan, louver, quiet or powerful.
+  Seen at 64 (floor heater) on a Thermor PRE thermostat behind a CozyBox,
+  2026-11-08 ; 16/32/4 are the catalogue's word. `docs/decisions.md`.
 - **Atlantic named eleven hot-water ids once**, on gduteil/cozytouch#129
   (234-288). Check that list before reverse-engineering an id in that range.
 
@@ -52,9 +56,6 @@ overturn one, edit the line here in the same pull request.
 - An `OVERRIDES` entry typing LORIA 416-425 as a heat pump : deduced from the
   catalogue, not measured. Wait for a dump ; if it carries `modelFamily`, there
   is nothing to map.
-- Rewiring `_room_entity` on capability 103026 : one observation, on air
-  conditioners only. A room behind a *radiator* gateway reading 16/32/64 there
-  is what would settle it.
 - A "house" climate entity on the HUB carrying the system's modes, with the
   rooms cut down to off and the current mode : declined by the maintainer
   (2026-09-28), with five other shapes the same day. The answer, as the app
