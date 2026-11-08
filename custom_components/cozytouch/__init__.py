@@ -101,6 +101,21 @@ def _register_devices(
         )
 
 
+def _rename_rooms(
+    hass: HomeAssistant, entry: CozytouchConfigEntry, hubs: dict[str, Hub]
+) -> None:
+    """Retitle a room's subentry after its zone, once.
+
+    Only a subentry still titled with the API's slot name : one somebody
+    renamed keeps their name. See docs/decisions.md.
+    """
+    for subentry_id, hub in hubs.items():
+        subentry = entry.subentries[subentry_id]
+        name = hub.get_room_name()
+        if name and subentry.title == subentry.data.get("name") != name:
+            hass.config_entries.async_update_subentry(entry, subentry, title=name)
+
+
 def _covered_prog_unique_ids(
     subentry_ids, existing_unique_ids: set[str]
 ) -> set[str]:
@@ -222,7 +237,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: CozytouchConfigEntry) ->
     account = CozytouchAccount(hass, entry.data["username"], entry.data["password"])
     account.set_dump_json(_setting(entry, "dump_json"))
 
-    entry.async_on_unload(entry.add_update_listener(_async_entry_updated))
     async_register_services(hass)
     await _async_serve_card(hass)
 
@@ -243,6 +257,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: CozytouchConfigEntry) ->
         )
         hub.set_create_entities_for_unknown_entities(create_unknown)
         hubs[subentry_id] = hub
+
+    # Before the listener : renaming a subentry would otherwise reload the
+    # entry being set up.
+    _rename_rooms(hass, entry, hubs)
+    entry.async_on_unload(entry.add_update_listener(_async_entry_updated))
 
     coordinator = AccountCoordinator(hass, account, entry, hubs)
     entry.runtime_data = CozytouchRuntimeData(account, hubs, coordinator)
