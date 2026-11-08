@@ -24,7 +24,7 @@ Preconditions:
 - **Read.** Run `R states service_du_systeme`. All three selects read
   `cool` ; the options are `['off', 'heat', 'cool', 'auto', 'dry']`.
 - **Change from one room.** Run
-  `R call select.select_option '{"entity_id": "select.room_bureau_service_du_systeme", "option": "dry"}'`.
+  `R call select.select_option '{"entity_id": "select.bureau_service_du_systeme", "option": "dry"}'`.
   `R journal` shows one 102020 write. After the next poll, every room's
   select reads `dry`.
 - **General stop.** Run the same call with `"option": "off"`. After a poll

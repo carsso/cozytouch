@@ -164,6 +164,7 @@ def registering_hub(via_device, hass=None):
         get_serial_number=lambda: "1234-5678-0000",
         get_software_version=lambda: None,
         get_via_device=lambda: via_device,
+        get_room_name=lambda: None,
         config_entry=SimpleNamespace(entry_id=ENTRY_ID),
     )
 

@@ -205,6 +205,7 @@ def coordinator(version):
         get_serial_number=lambda: "1234567890",
         get_software_version=lambda: version,
         get_via_device=lambda: None,
+        get_room_name=lambda: None,
         online=True,
     )
 

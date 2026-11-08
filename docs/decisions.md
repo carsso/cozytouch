@@ -2232,6 +2232,30 @@ child whose gateway nobody added. None rather than a guess matters : HA logs a
 warning when `via_device` names a device that is not in the registry. The
 registry-id spelling is covered under `__init__.py` above.
 
+### A room's device is named after its zone
+
+A device was registered under the model name by `device_info_for` and renamed
+to its subentry's title by the connectivity sensor ; the title is the API's
+`name`. For a gateway or an appliance that reads well (`CozyBox`, `HUB`). For a
+room it is the slot, `ROOM_0`, and the room's user never sees that word : the
+Thermor app shows a CozyBox's room as *Salon*, the name of the zone it serves,
+and the Navizone fixture's rooms are *Chambre parentale*, *Bureau* and
+*Chambre enfant* the same way. A user reported "it does not see it is the
+living room, it says ROOM_0" (2026-11-08).
+
+`Hub.get_room_name` returns that zone's name for a room, and None for anything
+else or for a room whose zone the account does not name. Both
+`device_info_for` and the connectivity sensor put it first. It has to be both :
+every entity of a subentry describes the device, the registry keeps the name
+from whichever was added last, and with the sensor alone an upgraded install
+came back as `Room (Chambre parentale)` beside `Chambre enfant`.
+
+What moves with it : a new install's entity ids follow the device name, so a
+room's climate is `climate.salon_piece` rather than `climate.room_salon_piece`.
+An existing install keeps the ids it has -- the registry does not regenerate
+them -- and only the device's displayed name changes ; a name the user set
+in Home Assistant still wins over both.
+
 ### The absence timestamps are plain unix time
 
 The sensor used to add the offset the device reports (315) to the timestamp
