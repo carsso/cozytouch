@@ -69,6 +69,18 @@ WRITABLE_PROGRAM_BLOCKS = {
 }
 
 
+# The occupancy program of a room behind a CozyBox : one capability per day,
+# monday first, sunday at 100341 and not 100340, which the catalogue holds
+# twice. Each slot names an ambiance, whose setpoint lives on its own
+# capability. See docs/decisions.md.
+OCCUPANCY_DAYS = (100334, 100335, 100336, 100337, 100338, 100339, 100341)
+OCCUPANCY_SETPOINTS = {
+    1: 100198,  # presence
+    2: 100196,  # absence
+    3: 100197,  # night
+}
+
+
 def program_block(first: int) -> range:
     """The seven consecutive capability ids one weekly program is stored in."""
     return range(first, first + len(PROGRAM_DAYS))

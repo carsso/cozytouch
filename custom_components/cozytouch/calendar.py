@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, time, timedelta
+import json
 import logging
 import re
 from typing import Any
@@ -17,7 +18,13 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, PROGRAM_BLOCKS, WRITABLE_PROGRAM_BLOCKS
+from .const import (
+    DOMAIN,
+    OCCUPANCY_DAYS,
+    OCCUPANCY_SETPOINTS,
+    PROGRAM_BLOCKS,
+    WRITABLE_PROGRAM_BLOCKS,
+)
 from .hub import CozytouchConfigEntry, CozytouchDeviceEntity, Hub
 from .services import build_matrix, in_charge_at, parse_slots, slot_limit, where_stored
 
@@ -51,6 +58,16 @@ async def async_setup_entry(
             )
             if first is not None
         ]
+
+        if all(
+            hub.get_capability_value(capabilityId, None) is not None
+            for capabilityId in OCCUPANCY_DAYS
+        ):
+            calendars.append(
+                CozytouchOccupancyCalendar(
+                    coordinator=hub, config_uniq_id=subentry_id
+                )
+            )
 
         if calendars:
             async_add_entities(calendars, True, config_subentry_id=subentry_id)
@@ -300,3 +317,68 @@ class CozytouchProgramCalendar(CozytouchDeviceEntity, CalendarEntity):
     def _handle_coordinator_update(self) -> None:
         """Publish the program the poll just brought back."""
         self.async_write_ha_state()
+
+
+class CozytouchOccupancyCalendar(CozytouchProgramCalendar):
+    """The occupancy program, each ambiance shown at the setpoint it holds.
+
+    Read only : how the app writes it has not been captured. A day may start
+    later than 00:00, and then the night before runs on until its first slot,
+    which is what the app draws. See docs/decisions.md.
+    """
+
+    def __init__(self, coordinator: Hub, config_uniq_id: str) -> None:
+        """Initialize the occupancy calendar."""
+        super().__init__(coordinator, config_uniq_id, "occupancy", OCCUPANCY_DAYS[0])
+
+    def _slots_for(self, weekday: int) -> list[dict]:
+        """One day's slots, opened by the night before when it starts late."""
+        slots, opens_at_midnight = self._own_slots(weekday)
+        if not opens_at_midnight:
+            before, _ = self._own_slots((weekday - 1) % 7)
+            if before:
+                slots.insert(0, {**before[-1], "time": time(0, 0)})
+        return slots
+
+    def _own_slots(self, weekday: int) -> tuple[list[dict], bool]:
+        """The slots stored for one day, and whether one of them starts it.
+
+        A slot whose ambiance has no setpoint is left out, but it still starts
+        the day it starts : the night before does not run on in its place.
+        """
+        capabilityId = OCCUPANCY_DAYS[weekday]
+        try:
+            stored = json.loads(
+                self.coordinator.get_capability_value(capabilityId, None) or "[]"
+            )
+        except ValueError:
+            stored = []
+
+        slots: dict[time, dict] = {}
+        opens_at_midnight = False
+        for entry in stored:
+            try:
+                minute, ambiance = (int(part) for part in entry[:2])
+                start = time(*divmod(minute, 60))
+            except (TypeError, ValueError):
+                continue
+            if not ambiance:
+                # [0,0] is an empty slot the device pads the day with.
+                continue
+            opens_at_midnight |= start == time(0, 0)
+            try:
+                temperature = self._setpoint_of(ambiance)
+            except (TypeError, ValueError, IndexError):
+                continue
+            slots[start] = {"time": start, "temperature": temperature}
+
+        return sorted(slots.values(), key=lambda slot: slot["time"]), opens_at_midnight
+
+    def _setpoint_of(self, ambiance: int) -> float:
+        """What an ambiance holds, raising for one with no setpoint."""
+        if ambiance not in OCCUPANCY_SETPOINTS:
+            raise ValueError(ambiance)
+        stored = self.coordinator.get_capability_value(
+            OCCUPANCY_SETPOINTS[ambiance], None
+        )
+        return float(json.loads(stored or "null")[0])

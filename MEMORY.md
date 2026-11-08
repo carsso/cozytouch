@@ -47,6 +47,10 @@ overturn one, edit the line here in the same pull request.
   conditioner** : off and heat, no cooling, fan, louver, quiet or powerful.
   Seen at 64 (floor heater) on a Thermor PRE thermostat behind a CozyBox,
   2026-11-08 ; 16/32/4 are the catalogue's word. `docs/decisions.md`.
+- **The occupancy program's ambiances are 1 presence (100198), 2 absence
+  (100196), 3 night (100197)** ; days 100334-100339 and 100341, not 100340.
+  Settled by the Thermor app's programming assistant on a CozyBox room,
+  2026-11-08. `docs/decisions.md`, *The occupancy program*.
 - **Atlantic named eleven hot-water ids once**, on gduteil/cozytouch#129
   (234-288). Check that list before reverse-engineering an id in that range.
 
