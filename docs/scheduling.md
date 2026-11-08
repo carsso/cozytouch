@@ -85,6 +85,12 @@ reports -- so the week can be looked at on a dashboard instead of read off
 seven sensors. Each slot is an event running until the next one takes over, and
 its title is the target temperature.
 
+A room behind a CozyBox -- the Thermor connected floor-heating thermostat, for
+one -- holds an *Occupancy Program* instead, the week the Thermor app draws in
+presence, absence and night. Each event's title is the setpoint of its
+ambiance. That calendar is read only : change the program, or the three
+setpoints, from the Thermor app.
+
 The seven per-day sensors of a block the calendar shows are disabled by
 default, on existing installations too : fourteen near-identical diagnostic
 rows per air conditioner said the same thing worse. Nothing is removed -- a

@@ -2411,6 +2411,39 @@ API does — would raise there instead, taking the whole calendar with it.
 built on that assumption without checking would put an evening setpoint in
 charge of the morning.
 
+### The occupancy program is a calendar too, read only
+
+A room behind a CozyBox (2448) holding a Thermor connected floor-heating
+thermostat (THZONE 1505) reports no heating block. Its program is the
+occupancy one, 100334-100339 and 100341, which the catalogue calls
+`ROOM_OccupancySchedule<Day>` and which the per-day `lifestyle_prog_*` sensors
+were already printing as raw matrices. 100340 is the catalogue's second
+sunday, `ROOM_OccupancyScheduleSunday_` ; the device reports 100341 and not
+it, so the calendar asks for those seven and builds nothing on a partial week,
+as the blocks above do.
+
+A slot is `[minutes, ambiance]`, and the ambiance is what the Thermor app
+calls *Présence*, *Absence* and *Nuit*. Which number is which was settled on
+2026-11-08 by running the app's programming assistant on that room : wake at
+06:00, out 07:00-21:00 on weekdays, bed at 22:00, presence 19, absence 17,
+night 18. The days came back as `[[0,3],[360,1],[420,2],[1260,1],[1320,3]]`
+and the weekend as `[[0,3],[360,1],[1320,3]]`, and the setpoints as 100198
+`[19,0]`, 100196 `[17,0]` and 100197 `[18,0]`. So 1 is presence on 100198, 2
+absence on 100196, 3 night on 100197, and each event's title is that setpoint,
+which is what the other calendars show.
+
+Before the assistant ran, the days started at 02:00 (`[[120,1],[360,2],
+[840,1],[1200,3]]`), with no slot at 00:00, and the app's week view drew
+00:00-02:00 as night, the ambiance the day before ended on. The calendar does
+the same. A slot whose ambiance has no readable setpoint is dropped but still
+starts its day, so the night before does not run on in its place.
+
+It is read only. The capture shows what the app wrote, not how : whether the
+seven days and three setpoints go as one write or several, and whether the
+device takes a first slot later than 00:00 from anything but the app, are
+unseen, and the event title would have to be mapped back from a temperature to
+an ambiance that may share it. The three setpoints stay the app's to change.
+
 ### `heating` and `cooling` are the service's words
 
 Kept so one vocabulary covers all three blocks. `capability.py` calls 203-209

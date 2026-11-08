@@ -76,7 +76,8 @@
         "calendar": {
             "heating_program":         { "name": "Programa de calefacción" },
             "cooling_program":         { "name": "Programa de refrigeración" },
-            "hot_water_program":       { "name": "Programa de agua caliente" }
+            "hot_water_program":       { "name": "Programa de agua caliente" },
+            "occupancy_program":       { "name": "Programa de ocupación" }
         },
         "climate": {
             "room":
